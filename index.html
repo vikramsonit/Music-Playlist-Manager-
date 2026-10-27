@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Music Library{% endblock %}
+{% block content %}
+<div class="hero">
+  <div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONAL SOUNDTRACK</div><h1>Music that<br><em>moves you.</em></h1><p class="hero-copy">Collect your favorites. Build your mood. Keep every song close.</p></div>
+  <div class="hero-art"><div class="vinyl"><div class="vinyl-label">♫</div></div><span class="art-star star-one">✳</span><span class="art-star star-two">✦</span><div class="art-caption">PRESS PLAY<br><b>ON YOUR DAY</b></div></div>
+</div>
+<div class="stats-row">
+  <div class="stat-card"><span class="stat-icon">♫</span><div><small>IN YOUR LIBRARY</small><strong>{{ songs|length }} <span>tracks found</span></strong></div></div>
+  <div class="stat-card"><span class="stat-icon peach">▤</span><div><small>YOUR PLAYLISTS</small><strong>{{ playlists|length }} <span>collections</span></strong></div></div>
+</div>
+<div class="section-heading"><div><div class="eyebrow">THE COLLECTION</div><h2>Your music library <span class="heading-count">{{ songs|length }}</span></h2></div>
+<form class="search-form" action="{{ url_for('index') }}" method="get"><span>⌕</span><input type="search" name="q" value="{{ q }}" placeholder="Search songs, artists..."><button type="submit">Search</button></form></div>
+<div class="library-grid">
+  <section class="panel tracks-panel"><div class="panel-top"><h3>All tracks</h3><span class="muted">{{ songs|length }} songs</span></div>
+    {% if songs %}
+    <div class="track-list"><div class="track-header"><span># / TRACK</span><span>ALBUM</span><span>PLAYLIST</span><span></span></div>
+    {% for song in songs %}<div class="track-row"><div class="track-main"><span class="track-number">{{ "%02d"|format(loop.index) }}</span><span class="cover-mini cover-{{ loop.index % 5 }}"><span>♫</span></span><div class="track-text"><strong>{{ song.title }}</strong><small>{{ song.artist }}</small></div></div><div class="album-text">{{ song.album or '—' }}</div><div class="playlist-pill">{{ song.playlist_name or 'Unsorted' }}</div><form action="{{ url_for('delete_song', song_id=song.id) }}" method="post" onsubmit="return confirm('Delete this song?')"><button class="icon-button" title="Delete song" aria-label="Delete song">×</button></form></div>{% endfor %}
+    </div>
+    {% else %}<div class="empty-state"><div class="empty-note">♫</div><h3>{% if q %}No matches found{% else %}Your library starts here{% endif %}</h3><p>{% if q %}Try a different song, artist, or album.{% else %}Add your first track using the form and start building your collection.{% endif %}</p></div>{% endif %}
+  </section>
+  <aside class="right-column">
+    <section class="panel form-panel"><div class="panel-top"><div><div class="eyebrow">ADD TO COLLECTION</div><h3>Add a track</h3></div><span class="form-symbol">＋</span></div>
+      <form action="{{ url_for('add_song') }}" method="post" class="stack-form">
+        <label>Song title <input name="title" placeholder="e.g. Midnight City" required maxlength="160"></label>
+        <label>Artist <input name="artist" placeholder="e.g. M83" required maxlength="120"></label>
+        <label>Album <input name="album" placeholder="e.g. Hurry Up, We're Dreaming" maxlength="160"></label>
+        <label>Add to playlist <select name="playlist_id"><option value="">Unsorted / no playlist</option>{% for p in playlists %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}</select></label>
+        <button class="primary-button" type="submit">＋ Add song to library</button>
+      </form>
+    </section>
+    <section class="panel form-panel playlist-form-panel"><div class="panel-top"><div><div class="eyebrow">SET THE VIBE</div><h3>Create a playlist</h3></div><span class="form-symbol peach-symbol">♫</span></div>
+      <form action="{{ url_for('add_playlist') }}" method="post" class="stack-form">
+        <label>Playlist name <input name="name" placeholder="e.g. Late night drives" required maxlength="80"></label>
+        <label>Description <input name="description" placeholder="What's the mood?" maxlength="200"></label>
+        <button class="secondary-button" type="submit">Create playlist <span>↗</span></button>
+      </form>
+    </section>
+  </aside>
+</div>
+{% endblock %}
